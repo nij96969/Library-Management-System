@@ -38,7 +38,7 @@ def login_otp():
         otp = ''.join(random.choices(string.digits, k=6))
         send_otp(user.email, otp)
         session['otp'] = otp
-        session['user_id'] = user.id
+        session['user_id'] = user.user_id
         return redirect(url_for('auth.verify_otp_route'))
     return render_template('login_otp.html', form=form)
 
