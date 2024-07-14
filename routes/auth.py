@@ -21,7 +21,12 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.has_set_password and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for('main.dashboard'))
+            if user.is_admin:
+                return redirect(url_for('admin.dashboard'))
+            elif user.is_librarian:
+                return redirect(url_for('librarian.dashboard'))
+            else:
+                return redirect(url_for('main.user_home'))
         else:
             flash('Invalid email or password', 'error')
     return render_template('login.html', form=form)
@@ -38,7 +43,7 @@ def login_otp():
         otp = ''.join(random.choices(string.digits, k=6))
         send_otp(user.email, otp)
         session['otp'] = otp
-        session['user_id'] = user.user_id
+        session['user_id'] = user.id
         return redirect(url_for('auth.verify_otp_route'))
     return render_template('login_otp.html', form=form)
 
@@ -56,7 +61,13 @@ def verify_otp_route():
             session.pop('user_id', None)
             if not user.has_set_password:
                 return redirect(url_for('auth.set_password'))
-            return redirect(url_for('main.dashboard'))
+            else:
+                if user.is_admin:
+                    return redirect(url_for('admin.dashboard'))
+                elif user.is_librarian:
+                    return redirect(url_for('librarian.dashboard'))
+                else:
+                    return redirect(url_for('main.user_home'))
         else:
             flash('Invalid OTP', 'error')
     return render_template('verify_otp.html')
@@ -121,8 +132,13 @@ def callback():
     if not user.has_set_password:
         flash('Please set a password for your account.', 'info')
         return redirect(url_for('auth.set_password'))
-    
-    return redirect(url_for('main.dashboard'))
+    else:
+            if user.is_admin:
+                return redirect(url_for('admin.dashboard'))
+            elif user.is_librarian:
+                return redirect(url_for('librarian.dashboard'))
+            else:
+                return redirect(url_for('main.user_home'))
 
 @auth.route('/set_password', methods=['GET', 'POST'])
 @login_required

@@ -6,7 +6,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import Text 
 
 
-
 db = SQLAlchemy()
 
 class User(UserMixin, db.Model):
@@ -18,7 +17,7 @@ class User(UserMixin, db.Model):
     profile = db.relationship('Profile', backref='user', uselist=False)
     password_hash = db.Column(db.String(128))
     has_set_password = db.Column(db.Boolean, default=False)
-    role = db.Column(db.String(10), nullable=False)
+    role = db.Column(db.String(10), nullable=False, default='user')
     __table_args__ = (
         db.CheckConstraint("role IN ('admin', 'librarian', 'user')"),
     )
@@ -35,9 +34,18 @@ class User(UserMixin, db.Model):
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
-        self.role='user'
+        self.role='admin'
     def get_id(self):
         return str(self.user_id)
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+
+    @property
+    def is_librarian(self):
+        return self.role == 'librarian'
+
+
 
 class Profile(db.Model):
     __tablename__ = 'profiles'  # Consistent with table naming

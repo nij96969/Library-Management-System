@@ -1,54 +1,42 @@
-{% extends "base.html" %} {% block title %}User Home{% endblock %} {% block
-content %}
-<div class="container">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Welcome, {{ current_user.first_name }} {{ current_user.last_name }}</h1>
-    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-primary"
-      >Signout</a
-    >
-  </div>
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
 
-  <div class="row">
-    <div class="col-lg-8">
-      <h2>Search Books</h2>
-      <div class="input-group mb-4">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search for books..."
-        />
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" type="button">
-            Search
-          </button>
-        </div>
-      </div>
+<h1>Welcome, {{ current_user.first_name }} {{ current_user.last_name }}!</h1>
 
-      <h2>My Books</h2>
-      <div class="book-card">
-        <h3>Odoo 14 Development Cookbook</h3>
-        <p>Author: Parth Gajjar</p>
-        <p>
-          Rapidly build, customize, and manage secure and efficient business
-          applications using the latest features of Odoo 14
-        </p>
-        <a href="#" class="btn btn-primary">Return Book</a>
-      </div>
-    </div>
+<h2>Your Information</h2>
+<p><strong>Email:</strong> {{ current_user.email }}</p>
 
-    <div class="col-lg-4">
-      <h2>User Profile</h2>
-      <div class="user-profile">
-        <h3>{{ current_user.first_name }} {{ current_user.last_name }}</h3>
-        <p>{{ current_user.profile.location or 'Location not set' }}</p>
-        <p>{{ current_user.email }}</p>
-        <a
-          href="{{ url_for('profile.update_profile') }}"
-          class="btn btn-secondary"
-          >Edit Information</a
-        >
-      </div>
-    </div>
-  </div>
-</div>
+{% if current_user.profile %}
+    <h2>Your Profile</h2>
+    
+    {% if current_user.profile and current_user.profile.profile_picture %}
+    <img src="{{ url_for('static', filename=current_user.profile.profile_picture.replace('\\','/'))[7:] }}" 
+         alt="Profile Picture" 
+         class="img-thumbnail" 
+         style="max-width: 200px;"
+         >
+    {% else %}
+        <img src="{{ url_for('static', filename='default_profile.png') }}" 
+            alt="Default Profile Picture" 
+            class="img-thumbnail" 
+            style="max-width: 200px;">
+    {% endif %}
+
+    <p><strong>Bio:</strong> {{ current_user.profile.bio or 'Not set' }}</p>
+    <p><strong>Location:</strong> {{ current_user.profile.location or 'Not set' }}</p>
+    <p><strong>Birthdate:</strong> {{ current_user.profile.birthdate.strftime('%B %d, %Y') if current_user.profile.birthdate else 'Not set' }}</p>
+    <p><strong>Website:</strong> 
+        {% if current_user.profile.website %}
+            <a href="{{ current_user.profile.website }}" target="_blank">{{ current_user.profile.website }}</a>
+        {% else %}
+            Not set
+        {% endif %}
+    </p>
+{% else %}
+    <p>You haven't set up your profile yet.</p>
+{% endif %}
+
+<a href="{{ url_for('profile.update_profile') }}" class="btn btn-primary">Update Profile</a>
+
 {% endblock %}
