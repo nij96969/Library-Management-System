@@ -6,11 +6,12 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.types import Text 
 
 
+
 db = SQLAlchemy()
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'  # Consistent with table naming
-    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Assuming autoincrement
+    user_id = db.Column(db.Integer, primary_key=True)  # Assuming autoincrement
     email = db.Column(db.String(100), unique=True, nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
@@ -30,6 +31,13 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    def __init__(self, email, first_name, last_name):
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+        self.role='user'
+    def get_id(self):
+        return str(self.user_id)
 
 class Profile(db.Model):
     __tablename__ = 'profiles'  # Consistent with table naming
