@@ -20,7 +20,7 @@ def update_profile():
         if current_user.profile:
             profile = current_user.profile
         else:
-            profile = Profile(user_id=current_user.id)
+            profile = Profile(user_id=current_user.user_id)
             db.session.add(profile)
 
         profile.bio = form.bio.data
