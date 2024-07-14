@@ -59,16 +59,15 @@ class Profile(db.Model):
 
 
 class Book(db.Model):  # Singular for the class name
+    # id,etag,title,authors,publishedDate,description,pageCount,printType,maturityRating,imageLinks,language,previewLink,textSnippet,ISBN_10,ISBN_13,genre
     __tablename__ = 'books'
     book_id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Assuming autoincrement
     isbn = db.Column(db.String(13), unique=True)  
     title = db.Column(db.String(255), nullable=False)
     author = db.Column(db.String(255), nullable=False) 
     publisher = db.Column(db.String(100))            
-    publishDate = db.Column(db.Date)                    
+    publishDate = db.Column(db.String(20))                    
     genre = db.Column(db.String(50))
-    quantity = db.Column(db.Integer, nullable=False, default=0)
-    available = db.Column(db.Integer, nullable=False, default=0)
     image_url = db.Column(db.String(255))
     description = db.Column(Text)                     
     page_count = db.Column(db.Integer)                

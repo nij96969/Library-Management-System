@@ -11,17 +11,35 @@
       <div class="row">
         <div class="col-lg-8">
           <h2>Search Books</h2>
-          <div class="input-group mb-4">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Search for books..."
-            />
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button">
-                Search
-              </button>
+          <form class="search-form" action="./search" method="POST">
+            <div class="input-group">
+              <input
+                type="text"
+                name="search_query"
+                class="form-control"
+                placeholder="Search Books here"
+                aria-label="Search books"
+              />
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">Search</button>
+              </div>
             </div>
+          </form>
+          <h2>Recommended Books</h2>
+          <div class="row">
+            {% for book in recommendations %}
+            <div class="col-lg-4 col-md-6 mb-4">
+              <div class="card">
+                <img src="{{ book['imageLinks'] }}" class="card-img-top" alt="Book Image">
+                <div class="card-body">
+                  <h5 class="card-title">{{ book['title'] }}</h5>
+                  <p class="card-text"><strong>Authors:</strong> {{ book['authors'] }}</p>
+                  <p class="card-text"><strong>Published Date:</strong> {{ book['publishedDate'] }}</p>
+                  <p class="card-text"><strong>ISBN-13:</strong> {{ book['ISBN_13'] }}</p>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
           </div>
     
           <h2>My Books</h2>

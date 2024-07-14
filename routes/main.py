@@ -2,6 +2,7 @@ from flask import Blueprint, render_template,redirect,url_for,flash,request
 from flask_login import login_required, current_user
 from models import Book, db,Transaction
 from datetime import datetime
+from model import get_book_recommendations
 
 main = Blueprint('main', __name__)
 
@@ -22,18 +23,6 @@ def dashboard():
 def user_home():
     return render_template('user_home.html')
 
-@main.route('/search_books', methods=['GET', 'POST'])
-@login_required
-def search_books():
-    if request.method == 'POST':
-        search_query = request.form['search_query']
-        books = Book.query.filter(
-            (Book.title.contains(search_query)) |
-            (Book.author.contains(search_query)) |
-            (Book.isbn.contains(search_query))
-        ).all()
-        return render_template('search_results.html', books=books, query=search_query)
-    return render_template('search_books.html')
 
 @main.route('/book/<int:book_id>')
 @login_required

@@ -12,6 +12,10 @@ from routes.admin import admin
 from routes.librarian import librarian
 from models import Book
 from datetime import datetime
+from flask import render_template, request
+from model import get_book_recommendations
+
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -45,12 +49,13 @@ def add_books_pd():
     df = df.dropna()  # Remove rows with missing values (optional)
     df['authors'] = df['authors'].astype(str)
     with db.session.begin():
+        count=0
         for _, row in df.iterrows():
-            existing_book = Book.query.filter_by(isbn=str(int(row['ISBN_13']))).first()
-
-            if existing_book:
-                existing_book.quantity += 1
-                existing_book.available += 1
+            count+=1
+            if(count>100):
+                break
+            if Book.query.filter_by(isbn=str(int(row['ISBN_13']))).first():
+                print("book already exists")
             else:
                 try:
                     if '-' in row['publishedDate']:
@@ -59,18 +64,19 @@ def add_books_pd():
                         publish_date = datetime.strptime(row['publishedDate'], '%Y').date()
                 except ValueError:
                     publish_date = None
-
+                # id,etag,title,authors,publishedDate,description,pageCount,printType,maturityRating,imageLinks,language,previewLink,textSnippet,ISBN_10,ISBN_13,genre
                 book_data = {
                     'isbn': str(int(row['ISBN_13'])),
                     'title': row['title'],
                     'author': row['authors'],
-                    'publishDate': publish_date, 
+                    'publisher':row['authors'],
+                    'publishDate': row['publishedDate'], 
                     'description': row['description'],
                     'page_count': int(row['pageCount']),
                     'language': row['language'],
                     'image_url': row['imageLinks'],
-                    'quantity': 1, 
-                    'available': 1 
+                    'genre': row['genre'],
+                    'language':row['language'] 
                 }
 
                 new_book = Book(**book_data)
@@ -79,6 +85,13 @@ def add_books_pd():
         db.session.commit()
 
     print("Books added/updated successfully!")
+@app.route('/search', methods=['POST'])
+def search():
+    search_query = request.form.get('search_query')
+    recommendations = get_book_recommendations(search_query)
+    if isinstance(recommendations, str):  # Handle error message
+        recommendations = []
+    return render_template('user_home.html', recommendations=recommendations)
 
 if __name__ == '__main__':
     with app.app_context():
