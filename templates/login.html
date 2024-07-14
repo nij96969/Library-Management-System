@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Login</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Login with Email</h3>
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control") }}
+                    {% for error in form.email.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.password.label }}
+                    {{ form.password(class="form-control") }}
+                    {% for error in form.password.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h3>Or</h3>
+            <a href="{{ url_for('auth.login_google') }}" class="btn btn-danger">
+                <i class="fab fa-google"></i> Login with Google
+            </a>
+        </div>
+        <div class="col-md-4">
+            <h3>Login with OTP</h3>
+            <a href="{{ url_for('auth.login_otp') }}" class="btn btn-secondary">Login with OTP</a>
+        </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+</div>
+{% endblock %}

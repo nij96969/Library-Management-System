@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<h1>Welcome, {{ current_user.first_name }} {{ current_user.last_name }}!</h1>
+
+<h2>Your Information</h2>
+<p><strong>Email:</strong> {{ current_user.email }}</p>
+
+{% if current_user.profile %}
+    <h2>Your Profile</h2>
+    
+    {% if current_user.profile and current_user.profile.profile_picture %}
+    <img src="{{ url_for('static', filename=current_user.profile.profile_picture.replace('\\','/'))[7:] }}" 
+         alt="Profile Picture" 
+         class="img-thumbnail" 
+         style="max-width: 200px;"
+         >
+    {% else %}
+        <img src="{{ url_for('static', filename='default_profile.png') }}" 
+            alt="Default Profile Picture" 
+            class="img-thumbnail" 
+            style="max-width: 200px;">
+    {% endif %}
+
+    <p><strong>Bio:</strong> {{ current_user.profile.bio or 'Not set' }}</p>
+    <p><strong>Location:</strong> {{ current_user.profile.location or 'Not set' }}</p>
+    <p><strong>Birthdate:</strong> {{ current_user.profile.birthdate.strftime('%B %d, %Y') if current_user.profile.birthdate else 'Not set' }}</p>
+    <p><strong>Website:</strong> 
+        {% if current_user.profile.website %}
+            <a href="{{ current_user.profile.website }}" target="_blank">{{ current_user.profile.website }}</a>
+        {% else %}
+            Not set
+        {% endif %}
+    </p>
+{% else %}
+    <p>You haven't set up your profile yet.</p>
+{% endif %}
+
+<a href="{{ url_for('profile.update_profile') }}" class="btn btn-primary">Update Profile</a>
+
+{% endblock %}

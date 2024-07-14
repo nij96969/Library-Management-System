@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Welcome{% endblock %}
+{% block content %}
+<h1>Welcome to My App</h1>
+<p>This is a Flask application with Google Sign-In, email login, OTP login, and user profiles.</p>
+{% if not current_user.is_authenticated %}
+    <div class="login-options">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login with Email</a>
+        <a href="{{ url_for('auth.login_google') }}" class="btn btn-danger">Login with Google</a>
+        <a href="{{ url_for('auth.login_otp') }}" class="btn btn-success">Login with OTP</a>
+    </div>
+{% endif %}
+{% endblock %}
