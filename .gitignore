@@ -7,6 +7,7 @@ Dataset/
 Lib/
 Scripts/
 Include/
+var/
 
 # Ignore __pycache__ directories
 __pycache__/
