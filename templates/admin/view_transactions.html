@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>All Transactions</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Transaction ID</th>
+            <th>User</th>
+            <th>Book</th>
+            <th>Checkout Date</th>
+            <th>Due Date</th>
+            <th>Return Date</th>
+            <th>Late Fees</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for transaction in transactions %}
+        <tr>
+            <td>{{ transaction.transaction_id }}</td>
+            <td>{{ transaction.user.email }}</td>
+            <td>{{ transaction.book.title }}</td>
+            <td>{{ transaction.checkout_date }}</td>
+            <td>{{ transaction.due_date }}</td>
+            <td>{{ transaction.return_date or 'Not returned' }}</td>
+            <td>{{ transaction.late_fees }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
