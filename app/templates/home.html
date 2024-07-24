@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}User Home{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    {% if current_user.is_authenticated %}
+      <h1>Welcome, {{ current_user.username }}</h1>
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-primary">Signout</a>
+    {% endif %}
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <h2>Search Books</h2>
+      <form class="search-form" action="{{ url_for('main.search_books') }}" method="POST">
+        <div class="input-group">
+          <input type="text" name="search_query" class="form-control" placeholder="Search Books here" aria-label="Search books" value="{{ query }}" />
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </div>
+        </div>
+      </form>
+      
+      {% if query %}
+        <h2>Search Results for "{{ query }}"</h2>
+        {% if results %}
+            {% for book in results %}
+              <div class="book-card">
+                <div class="d-flex mb-3">
+                  <div class="book-image mr-3" style="flex: 0 0 150px;">
+                      <img src="{{ book.image_links }}" alt="Book" style="width: 100%; height: auto;">
+                  </div>
+                  <div class="book-details">
+                      <h3>{{ book.title }}</h3>
+                      <p><strong>Authors:</strong> {{ book.authors }}</p>
+                      <p><strong>Published Date:</strong> {{ book.published_date }}</p>
+                      <p><strong>ISBN-13:</strong> {{ book.isbn }}</p>
+                  </div>
+
+                </div>
+                {% if current_user.is_authenticated %}
+                <form action="{{ url_for('main.request_book') }}" method="POST">
+                  <input type="hidden" name="book_id" value="{{ book.book_id }}">
+                  <input type="hidden" name="user_id" value="{{ current_user.id }}">
+                  <button type="submit" class="btn btn-primary">Request Book</button>
+                </form>
+                {% endif %}
+              </div>
+            {% endfor %}
+        {% else %}
+            <p>No results found.</p>
+        {% endif %}
+      {% endif %}
+      
+    {% if current_user.is_authenticated %}
+        <h2>Recommended Books</h2>
+        {% for book in recommendations %}
+            <div class="book-card d-flex mb-3">
+            <div class="book-image mr-3" style="flex: 0 0 150px;">
+                <img src="{{ book['imageLinks'] }}" alt="Book" style="width: 100%; height: auto;">
+            </div>
+            <div class="book-details">
+                <h3>{{ book['title'] }}</h3>
+                <p><strong>Authors:</strong> {{ book['authors'] }}</p>
+                <p><strong>Published Date:</strong> {{ book['publishedDate'] }}</p>
+                <p><strong>ISBN-13:</strong> {{ book['ISBN_13'] }}</p>
+            </div>
+            </div>
+        {% endfor %}
+
+      <h2>My Books</h2>
+      <div class="book-card">
+        <h3>Odoo 14 Development Cookbook</h3>
+        <p>Author: Parth Gajjar</p>
+        <p>
+          Rapidly build, customize, and manage secure and efficient business
+          applications using the latest features of Odoo 14
+        </p>
+        <a href="#" class="btn btn-primary">Return Book</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

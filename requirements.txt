@@ -1,7 +1,11 @@
-flask 
-flask-sqlalchemy 
-flask-login 
-flask-wtf 
-requests 
+Flask
+Flask-SQLAlchemy
+Flask-WTF
+Flask-Login
+Werkzeug
 oauthlib 
-python-dotenv
+requests
+dotenv
+email_validator
+redis
+rq
