@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template , redirect , url_for , flash
 from flask_login import login_required , current_user
 from functools import wraps
+from app.models import RequestBook , User , Transaction
 
 librarian = Blueprint('librarian' , __name__)
 
@@ -14,11 +15,18 @@ def librarian_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def find_request_book():
+    requested_book = RequestBook.query.all()
+    return requested_book
+
 @librarian.route('/librarian/dashboard')
 @login_required
 @librarian_required
 def dashboard():
-    return render_template('librarian/dashboard.html')
+
+    requested_book = find_request_book()
+
+    return render_template('librarian/dashboard.html' , results = requested_book)
 
 @librarian.route('/librarian/accept_request')
 @login_required

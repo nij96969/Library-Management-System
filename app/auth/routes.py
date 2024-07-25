@@ -24,10 +24,13 @@ def login():
         if user and user.check_password(password):
             login_user(user)
 
-            if user.is_admin:
+            if user.is_admin():
                 return redirect(url_for('admin.dashboard'))
             
-            return redirect(url_for('main.home'))
+            if user.is_librarian():
+                return redirect(url_for('librarian.dashboard'))
+            else:
+                return redirect(url_for('main.home'))
         else:
             flash('Invalid username or password')
 

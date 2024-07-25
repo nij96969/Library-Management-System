@@ -7,4 +7,26 @@
     {% else %}
         <p>Please log in or sign up.</p>
     {% endif %}
+
+    {% if results %}
+            {% for request in results %}
+              <div class="book-card">
+                <div class="d-flex mb-3">
+                  <div class="book-details" style="flex: 0 0 150px">
+                      <p><strong>User id:</strong> {{ request.user_id }}</p>
+                      <p><strong>Book id:</strong> {{ request.book_id }}</p>
+                  </div>
+                </div>
+
+                <form action="{{ url_for('main.request_book') }}" method="POST">
+                  <input type="hidden" name="book_id" value="{{ request.book_id }}">
+                  <input type="hidden" name="user_id" value="{{ request.user_id }}">
+                  <button type="submit" class="btn btn-primary">Accept Request</button>
+                </form>
+
+              </div>
+            {% endfor %}
+        {% else %}
+            <p>No results found.</p>
+      {% endif %}
 {% endblock %}

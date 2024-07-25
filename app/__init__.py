@@ -30,6 +30,7 @@ def create_app():
     app.register_blueprint(main)
     app.register_blueprint(admin)
     app.register_blueprint(librarian)
+    
     from app.models import User
 
     @login_manager.user_loader
@@ -45,7 +46,7 @@ def create_app():
     app.config['GOOGLE_PROVIDER_CFG'] = google_provider_cfg
 
     # Set up Redis connection and queue
-    redis_conn = redis.Redis()
-    app.queue = Queue('requests', connection=redis_conn)
+    # redis_conn = redis.Redis()
+    # app.queue = Queue('requests', connection=redis_conn)
     
     return app
