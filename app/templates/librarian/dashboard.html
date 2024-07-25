@@ -1,32 +1,68 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Dashboard{% endblock %}
 {% block content %}
     <h1>Welcome to the Flask App</h1>
     {% if current_user.is_authenticated %}
-        <p>Welcome {{current_user.role}}, {{ current_user.username }}!</p>
+        <p>Welcome {{ current_user.role }}, {{ current_user.username }}!</p>
     {% else %}
         <p>Please log in or sign up.</p>
     {% endif %}
 
-    {% if results %}
-            {% for request in results %}
-              <div class="book-card">
-                <div class="d-flex mb-3">
-                  <div class="book-details" style="flex: 0 0 150px">
-                      <p><strong>User id:</strong> {{ request.user_id }}</p>
-                      <p><strong>Book id:</strong> {{ request.book_id }}</p>
-                  </div>
-                </div>
+    <h1>Book Requests From the Users</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Book ID</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in requests %}
+        <tr>
+          <td>{{ req.user_id }}</td>
+          <td>{{ req.book_id }}</td>
+          <td>
+            <form action="{{ url_for('librarian.accept_request') }}" method="POST" style="display: inline;">
+              <input type="hidden" name="user_id" value="{{ req.user_id }}">
+              <input type="hidden" name="book_id" value="{{ req.book_id }}">
+              <button type="submit" class="btn btn-primary">Accept Request</button>
+            </form>
+            <form action="{{ url_for('librarian.reject_request') }}" method="POST" style="display: inline;">
+              <input type="hidden" name="user_id" value="{{ req.user_id }}">
+              <input type="hidden" name="book_id" value="{{ req.book_id }}">
+              <button type="submit" class="btn btn-danger">Reject Request</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-                <form action="{{ url_for('main.request_book') }}" method="POST">
-                  <input type="hidden" name="book_id" value="{{ request.book_id }}">
-                  <input type="hidden" name="user_id" value="{{ request.user_id }}">
-                  <button type="submit" class="btn btn-primary">Accept Request</button>
-                </form>
-
-              </div>
-            {% endfor %}
-        {% else %}
-            <p>No results found.</p>
-      {% endif %}
+    <h1>Returns Book Request From the Users</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Book ID</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ret in returns %}
+        <tr>
+          <td>{{ ret.user_id }}</td>
+          <td>{{ ret.book_id }}</td>
+          <td>
+            <!-- You can add buttons for handling returns if needed -->
+            <form action="{{ url_for('librarian.accept_return_request') }}" method="POST" style="display: inline;">
+              <input type="hidden" name="user_id" value="{{ ret.user_id }}">
+              <input type="hidden" name="book_id" value="{{ ret.book_id }}">
+              <button type="submit" class="btn btn-success">Process Return</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 {% endblock %}

@@ -24,35 +24,34 @@
       </form>
       
       {% if query %}
-        <h2>Search Results for "{{ query }}"</h2>
-        {% if results %}
-            {% for book in results %}
+      <h2>Search Results for "{{ query }}"</h2>
+      {% if results %}
+          {% for book in results %}
               <div class="book-card">
-                <div class="d-flex mb-3">
-                  <div class="book-image mr-3" style="flex: 0 0 150px;">
-                      <img src="{{ book.image_links }}" alt="Book" style="width: 100%; height: auto;">
+                  <div class="d-flex mb-3">
+                      <div class="book-image mr-3" style="flex: 0 0 150px;">
+                          <img src="{{ book.image_links }}" alt="Book" style="width: 100%; height: auto;">
+                      </div>
+                      <div class="book-details">
+                          <h3>{{ book.title }}</h3>
+                          <p><strong>Authors:</strong> {{ book.authors }}</p>
+                          <p><strong>Published Date:</strong> {{ book.published_date }}</p>
+                          <p><strong>ISBN-13:</strong> {{ book.isbn }}</p>
+                      </div>
                   </div>
-                  <div class="book-details">
-                      <h3>{{ book.title }}</h3>
-                      <p><strong>Authors:</strong> {{ book.authors }}</p>
-                      <p><strong>Published Date:</strong> {{ book.published_date }}</p>
-                      <p><strong>ISBN-13:</strong> {{ book.isbn }}</p>
-                  </div>
-
-                </div>
-                {% if current_user.is_authenticated %}
-                <form action="{{ url_for('main.request_book') }}" method="POST">
-                  <input type="hidden" name="book_id" value="{{ book.book_id }}">
-                  <input type="hidden" name="user_id" value="{{ current_user.id }}">
-                  <button type="submit" class="btn btn-primary">Request Book</button>
-                </form>
-                {% endif %}
+                  {% if current_user.is_authenticated %}
+                  <form action="{{ url_for('main.request_book') }}" method="POST">
+                      <input type="hidden" name="book_id" value="{{ book.book_id }}">
+                      <input type="hidden" name="user_id" value="{{ current_user.id }}">
+                      <button type="submit" class="btn btn-primary">Request Book</button>
+                  </form>
+                  {% endif %}
               </div>
-            {% endfor %}
-        {% else %}
-            <p>No results found.</p>
-        {% endif %}
+          {% endfor %}
+      {% else %}
+          <p>No results found.</p>
       {% endif %}
+  {% endif %}
       
     {% if current_user.is_authenticated %}
         <h2>Recommended Books</h2>
@@ -70,16 +69,28 @@
             </div>
         {% endfor %}
 
-      <h2>My Books</h2>
-      <div class="book-card">
-        <h3>Odoo 14 Development Cookbook</h3>
-        <p>Author: Parth Gajjar</p>
-        <p>
-          Rapidly build, customize, and manage secure and efficient business
-          applications using the latest features of Odoo 14
-        </p>
-        <a href="#" class="btn btn-primary">Return Book</a>
-      </div>
+        <h2>My Books</h2>
+        
+        {% if borrowed_books %}
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h2>My Borrowed Books</h2>
+          <form action="{{ url_for('main.refresh') }}" method="POST" style="margin: 0;">
+              <button type="submit" class="btn btn-secondary">Refresh</button>
+          </form>
+        </div>
+          {% for book in borrowed_books %}
+              <div class="book-card">
+                  <h3>{{ book.title }}</h3>
+                  <p><strong>Borrow Date:</strong> {{ book.borrow_date }}</p>
+                  <p><strong>Return Date:</strong> {{ book.return_date }}</p>
+                  <form action="{{ url_for('main.return_book') }}" method="POST">
+                      <input type="hidden" name="book_id" value="{{ book.book_id }}">
+                      <input type="hidden" name="user_id" value="{{ current_user.id }}">
+                      <button type="submit" class="btn btn-primary">Return Book</button>
+                  </form>
+              </div>
+          {% endfor %}
+        {% endif %}        
       {% endif %}
     </div>
   </div>

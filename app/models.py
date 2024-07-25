@@ -48,11 +48,22 @@ class Book(db.Model):
     image_links = db.Column(db.String(255), nullable=True, server_default="N/A")
     language = db.Column(db.String(10), nullable=False, server_default="N/A")
     categories = db.Column(db.String(255), nullable=True, server_default="N/A")
+    # is_available = db.Column(db.Boolean , default = True)
 
     transactions = db.relationship('Transaction', back_populates='book')
     borrowed_books = db.relationship('BorrowedBook', back_populates='book')
     requests = db.relationship('RequestBook', back_populates='book')  # Consistent naming
     return_books = db.relationship('ReturnBook', back_populates='book')  # Consistent naming
+
+    def to_dict(self):
+        return {
+            'book_id': self.book_id,
+            'title': self.title,
+            'authors': self.authors,
+            'published_date': self.published_date,
+            'isbn': self.isbn,
+            'image_links': self.image_links
+        }
 
 class Transaction(db.Model):
     __tablename__ = 'transactions'  # Changed to plural for consistency
@@ -80,6 +91,14 @@ class BorrowedBook(db.Model):
     user = db.relationship("User", back_populates="borrowed_books")
     book = db.relationship("Book", back_populates="borrowed_books")
 
+    def to_dict(self):
+        return {
+            'book_id': self.book_id,
+            'borrow_date': self.borrow_date,
+            'return_date': self.return_date,
+            'title': self.book.title  # Including book title if needed
+        }
+
 class RequestBook(db.Model):
     __tablename__ = 'request_books'  # Changed to plural for consistency
 
@@ -92,6 +111,13 @@ class RequestBook(db.Model):
     user = db.relationship("User", back_populates="requests")
     book = db.relationship("Book", back_populates="requests")
 
+    def to_dict(self):
+        return{
+            'request_id':self.request_id,
+            'user_id':self.user_id,
+            'book_id':self.book_id
+        }
+
 class ReturnBook(db.Model):
     __tablename__ = 'return_books'  # Changed to plural for consistency
 
@@ -103,3 +129,10 @@ class ReturnBook(db.Model):
 
     user = db.relationship("User", back_populates="return_books")  # Corrected typo
     book = db.relationship("Book", back_populates="return_books")  # Corrected typo
+
+    def to_dict(self):
+        return{
+            'request_id':self.request_id,
+            'user_id':self.user_id,
+            'book_id':self.book_id
+        }
