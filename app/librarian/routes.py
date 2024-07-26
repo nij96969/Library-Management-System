@@ -9,7 +9,7 @@ librarian = Blueprint('librarian' , __name__)
 def librarian_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_librarian or not current_user.is_authenticated:
+        if not current_user.is_librarian() or not current_user.is_authenticated:
             flash('You do not have permission to access this page.', 'danger')
             return redirect(url_for('main.home'))
         

@@ -69,15 +69,13 @@
             </div>
         {% endfor %}
 
-        <h2>My Books</h2>
-        
-        {% if borrowed_books %}
         <div style="display: flex; align-items: center; justify-content: space-between;">
-          <h2>My Borrowed Books</h2>
+          <h2>My Books</h2>
           <form action="{{ url_for('main.refresh') }}" method="POST" style="margin: 0;">
               <button type="submit" class="btn btn-secondary">Refresh</button>
           </form>
         </div>
+        {% if borrowed_books %}
           {% for book in borrowed_books %}
               <div class="book-card">
                   <h3>{{ book.title }}</h3>

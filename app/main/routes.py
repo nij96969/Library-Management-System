@@ -8,35 +8,30 @@ from sqlalchemy.orm import joinedload
 main = Blueprint('main', __name__)
 
 def books_in_library(search_query):
+    results = Book.query.filter(Book.title.ilike(f"%{search_query}%")).all()
+    session['searched_books'] = [books.to_dict() for books in results]
+    session['query'] = search_query
     return Book.query.filter(Book.title.ilike(f"%{search_query}%")).all()
 
 def find_borrowed_book():
+    borrowed_books = BorrowedBook.query.options(joinedload(BorrowedBook.book)).filter_by(user_id=current_user.id).all()
+    session['borrowed_books'] = [book.to_dict() for book in borrowed_books]
     return BorrowedBook.query.options(joinedload(BorrowedBook.book)).filter_by(user_id=current_user.id).all()
 
 @main.route('/')
 def home():
-    borrowed_books = find_borrowed_book()
-    session['borrowed_books'] = [book.to_dict() for book in borrowed_books]
-    return render_template('home.html', borrowed_books=session.get('borrowed_books',[]))
+    if current_user.is_authenticated:
+        find_borrowed_book()
+        return render_template('home.html', borrowed_books=session.get('borrowed_books',[]) , results = session.get('searched_books',[]) , query = session.get('query',''))
 
+    return render_template('home.html', results = session.get('searched_books',[]) , query = session.get('query',''))
 @main.route('/search', methods=['GET', 'POST'])
 def search_books():
     if request.method == 'POST':
         search_query = request.form.get('search_query', '').strip()
-        results = books_in_library(search_query)
-        borrowed_books = find_borrowed_book()
+        books_in_library(search_query)
 
-        # Store in session
-        session['search_query'] = search_query
-        session['results'] = [book.to_dict() for book in results]
-        session['borrowed_books'] = [book.to_dict() for book in borrowed_books]
-
-    # Retrieve from session
-    search_query = session.get('search_query', '')
-    results = session.get('results', [])
-    borrowed_books = session.get('borrowed_books', [])
-
-    return render_template('home.html', results=results, query=search_query, borrowed_books=borrowed_books)
+    return redirect(url_for('main.home'))
 
 
 @login_required
@@ -70,13 +65,8 @@ def request_book():
         db.session.commit()
         
         flash('Book Request sent')
-    
-    # Retrieve from session
-    search_query = session.get('search_query', '')
-    results = session.get('results', [])
-    borrowed_books = session.get('borrowed_books', [])
 
-    return render_template('home.html', results=results, query=search_query , borrowed_books=borrowed_books)
+    return redirect(url_for('main.home'))
 
 @login_required
 @main.route('/return_book', methods=['POST'])
@@ -105,23 +95,9 @@ def return_book():
 
         flash('Request to return Book sent')
 
-    # Retrieve from session
-    search_query = session.get('search_query', '')
-    results = session.get('results', [])
-    borrowed_books = session.get('borrowed_books', [])
-
-    return render_template('home.html', results=results, query=search_query , borrowed_books=borrowed_books)
+    return redirect(url_for('main.home'))
 
 @main.route('/refresh', methods = ['POST'])
 @login_required
 def refresh():
-    # Retrieve from session
-    search_query = session.get('search_query', '')
-    results = session.get('results', [])
-    
-    borrowed_books = find_borrowed_book()
-    session['borrowed_books'] = [book.to_dict() for book in borrowed_books]
-    borrowed_books = session.get('borrowed_books',[])
-
-
-    return render_template('home.html', results=results, query=search_query, borrowed_books=borrowed_books)
+    return redirect(url_for('main.home'))
