@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     transactions = db.relationship('Transaction', back_populates='user')
     requests = db.relationship('RequestBook', back_populates='user')
     borrowed_books = db.relationship('BorrowedBook', back_populates='user')
-    return_books = db.relationship('ReturnBook', back_populates='user')  # Corrected typo
+    return_books = db.relationship('ReturnBook', back_populates='user') 
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -52,8 +52,8 @@ class Book(db.Model):
 
     transactions = db.relationship('Transaction', back_populates='book')
     borrowed_books = db.relationship('BorrowedBook', back_populates='book')
-    requests = db.relationship('RequestBook', back_populates='book')  # Consistent naming
-    return_books = db.relationship('ReturnBook', back_populates='book')  # Consistent naming
+    requests = db.relationship('RequestBook', back_populates='book')  
+    return_books = db.relationship('ReturnBook', back_populates='book') 
 
     def to_dict(self):
         return {
@@ -96,7 +96,8 @@ class BorrowedBook(db.Model):
             'book_id': self.book_id,
             'borrow_date': self.borrow_date,
             'return_date': self.return_date,
-            'title': self.book.title  # Including book title if needed
+            'title': self.book.title,
+            'img': self.book.image_links
         }
 
 class RequestBook(db.Model):
@@ -127,8 +128,8 @@ class ReturnBook(db.Model):
     status = db.Column(db.String(20), default='pending')  # values: 'pending', 'approved', 'rejected'
     request_date = db.Column(db.DateTime(timezone=True), default=func.now())
 
-    user = db.relationship("User", back_populates="return_books")  # Corrected typo
-    book = db.relationship("Book", back_populates="return_books")  # Corrected typo
+    user = db.relationship("User", back_populates="return_books")
+    book = db.relationship("Book", back_populates="return_books") 
 
     def to_dict(self):
         return{
