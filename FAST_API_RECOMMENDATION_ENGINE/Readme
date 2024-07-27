@@ -1,0 +1,21 @@
+Here's what's new in this updated version:
+
+We've added global variables for tfidf_matrix and defined paths for storing our precomputed data.
+The preprocess_data function now handles all the data preprocessing, TF-IDF vectorization, and similarity calculations. It also saves the computed data using joblib.
+In the startup_event function, we first check if precomputed data exists. If it does, we load it. If not, we process the initial data.
+We've added a new endpoint /update_data that allows updating the dataframe with new data. When this endpoint is called, it reads a new CSV file, preprocesses the data, recomputes the TF-IDF matrix and similarities, and saves the updated data.
+Error handling has been improved using FastAPI's HTTPException.
+
+To use this updated version:
+
+Save this script and run it as before.
+The first time you run it, it will process the initial data and save the results.
+On subsequent runs, it will load the precomputed data, making startup faster.
+To update the data, you can make a POST request to /update_data with a JSON body like this:
+
+jsonCopy{
+    "csv_path": "path/to/new_data.csv"
+}
+This will update the dataframe, recompute the TF-IDF matrix and similarities, and save the new data for future use.
+The /recommend endpoint works as before, but now it's using the stored (and potentially updated) data.
+This approach allows you to persist the TF-IDF matrix and other computed data between server restarts, and provides a way to update the data when needed. The TF-IDF matrix and other large data structures are stored in separate files in a data directory, which helps manage memory usage and improves startup time after the initial computation.
