@@ -1,6 +1,7 @@
 # Ignore .env file
 .env
 pyvenv.cfg
+
 # Ignore folders
 Extra/
 Dataset/

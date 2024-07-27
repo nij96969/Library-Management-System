@@ -5,6 +5,7 @@ from app import db, create_app
 def import_books(csv_file):
     app = create_app()
     with app.app_context():
+        db.session.query(Book).delete()
         with open(csv_file, newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             for row in reader:
@@ -31,4 +32,4 @@ def import_books(csv_file):
             print("all new books added")
 
 if __name__ == '__main__':
-    import_books(r'D:\Development Project\Library Management System\Dataset\books_set.csv')
+    import_books(r'D:\Odoo Hackathon\Library-Management-System\Dataset\books_set.csv')

@@ -36,4 +36,3 @@ if __name__ == "__main__":
     response = requests.post('http://localhost:8000/update_data', 
                              json={'data': data_json})
     print(response.json())
-    # print(df)
