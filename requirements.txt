@@ -10,3 +10,5 @@ redis
 rq
 pandas
 python-dotenv
+fastapi 
+uvicorn

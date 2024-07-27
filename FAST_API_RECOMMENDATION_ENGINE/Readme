@@ -19,3 +19,8 @@ jsonCopy{
 This will update the dataframe, recompute the TF-IDF matrix and similarities, and save the new data for future use.
 The /recommend endpoint works as before, but now it's using the stored (and potentially updated) data.
 This approach allows you to persist the TF-IDF matrix and other computed data between server restarts, and provides a way to update the data when needed. The TF-IDF matrix and other large data structures are stored in separate files in a data directory, which helps manage memory usage and improves startup time after the initial computation.
+
+To start the Fast API 
+uvicorn model_api:app --reload
+
+The above command will automatically update the Fast_API whenever you make changes to model_api.py
