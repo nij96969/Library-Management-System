@@ -28,6 +28,7 @@ def import_books(csv_file):
                 )
                 db.session.add(book)
             db.session.commit()
+            print("all new books added")
 
 if __name__ == '__main__':
     import_books(r'D:\Development Project\Library Management System\Dataset\books_set.csv')

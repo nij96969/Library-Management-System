@@ -1,6 +1,8 @@
-from app import create_app, db
+from app import create_app
 from app.models import Book
 import pandas as pd
+import requests , json
+
 def query_books():
     # Create an application context to interact with the database
     app = create_app()
@@ -14,16 +16,9 @@ def query_books():
         for book in books:
             books_data.append({
                 'book_id': book.book_id,
-                'isbn': book.isbn,
                 'title': book.title,
                 'authors': book.authors,
-                'published_date': book.published_date,
                 'description': book.description,
-                'page_count': book.page_count,
-                'maturity_rating': book.maturity_rating,
-                'image_links': book.image_links,
-                'language': book.language,
-                'categories': book.categories
             })
         
         # Convert list of dictionaries into a Pandas DataFrame
@@ -32,5 +27,13 @@ def query_books():
         return df
 
 if __name__ == "__main__":
+    
     df = query_books()
-    print(df)
+
+    # Convert DataFrame to JSON
+    data_json = df.to_dict(orient='records')
+    
+    response = requests.post('http://localhost:8000/update_data', 
+                             json={'data': data_json})
+    print(response.json())
+    # print(df)

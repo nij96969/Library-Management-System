@@ -9,4 +9,4 @@ email_validator
 redis
 rq
 pandas
-dotenv
+python-dotenv
