@@ -4,9 +4,7 @@
 # Ignore folders
 Extra/
 Dataset/
-Lib/
-Scripts/
-Include/
+vevn/
 var/
 
 # Ignore __pycache__ directories
