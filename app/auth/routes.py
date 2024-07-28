@@ -61,6 +61,11 @@ def signup():
 @auth.route('/logout')
 @login_required
 def logout():
+
+    session.pop('recommendations_generated', None)
+    session.pop('searched_books', None)
+    session.pop('query', None)
+    session.pop('borrowed_books', None)
     logout_user()
     return redirect(url_for('main.home'))
 

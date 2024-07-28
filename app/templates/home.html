@@ -22,10 +22,10 @@
           </div>
         </div>
       </form>
-      
+
       {% if query %}
-      <h2>Search Results for "{{ query }}"</h2>
-      {% if results %}
+        <h2>Search Results for "{{ query }}"</h2>
+        {% if results %}
           {% for book in results %}
               <div class="book-card">
                   <div class="d-flex mb-3">
@@ -43,6 +43,8 @@
                   <form action="{{ url_for('main.request_book') }}" method="POST">
                       <input type="hidden" name="book_id" value="{{ book.book_id }}">
                       <input type="hidden" name="user_id" value="{{ current_user.id }}">
+                      <input type="hidden" name="search_query" value="{{ query }}">
+                      <input type="hidden" name="results" value="{{ results }}">
                       <button type="submit" class="btn btn-primary">Request Book</button>
                   </form>
                   {% endif %}
@@ -51,45 +53,7 @@
       {% else %}
           <p>No results found.</p>
       {% endif %}
-  {% endif %}
-      
-    {% if current_user.is_authenticated %}
-        <h2>Recommended Books</h2>
-        {% for book in recommendations %}
-            <div class="book-card d-flex mb-3">
-            <div class="book-image mr-3" style="flex: 0 0 150px;">
-                <img src="{{ book['imageLinks'] }}" alt="Book" style="width: 100%; height: auto;">
-            </div>
-            <div class="book-details">
-                <h3>{{ book['title'] }}</h3>
-                <p><strong>Authors:</strong> {{ book['authors'] }}</p>
-                <p><strong>Published Date:</strong> {{ book['publishedDate'] }}</p>
-                <p><strong>ISBN-13:</strong> {{ book['ISBN_13'] }}</p>
-            </div>
-            </div>
-        {% endfor %}
-
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <h2>My Books</h2>
-          <form action="{{ url_for('main.refresh') }}" method="POST" style="margin: 0;">
-              <button type="submit" class="btn btn-secondary">Refresh</button>
-          </form>
-        </div>
-        {% if borrowed_books %}
-          {% for book in borrowed_books %}
-              <div class="book-card">
-                  <h3>{{ book.title }}</h3>
-                  <p><strong>Borrow Date:</strong> {{ book.borrow_date }}</p>
-                  <p><strong>Return Date:</strong> {{ book.return_date }}</p>
-                  <form action="{{ url_for('main.return_book') }}" method="POST">
-                      <input type="hidden" name="book_id" value="{{ book.book_id }}">
-                      <input type="hidden" name="user_id" value="{{ current_user.id }}">
-                      <button type="submit" class="btn btn-primary">Return Book</button>
-                  </form>
-              </div>
-          {% endfor %}
-        {% endif %}        
-      {% endif %}
+    {% endif %}
     </div>
   </div>
 </div>

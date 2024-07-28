@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}User Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if current_user.is_authenticated %}
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h2>My Books</h2>
+            <form action="{{ url_for('main.refresh') }}" method="POST" style="margin: 0;">
+                <button type="submit" class="btn btn-secondary">Refresh</button>
+            </form>
+        </div>
+        {% if borrowed_books %}
+          {% for book in borrowed_books %}
+              <div class="book-card">
+                  <h3>{{ book.title }}</h3>
+                  <p><strong>Borrow Date:</strong> {{ book.borrow_date }}</p>
+                  <p><strong>Return Date:</strong> {{ book.return_date }}</p>
+                  <form action="{{ url_for('main.return_book') }}" method="POST">
+                      <input type="hidden" name="book_id" value="{{ book.book_id }}">
+                      <input type="hidden" name="user_id" value="{{ current_user.id }}">
+                      <button type="submit" class="btn btn-primary">Return Book</button>
+                  </form>
+              </div>
+          {% endfor %}
+        {% endif %}        
+      {% endif %}
+</div>
+{% endblock %}

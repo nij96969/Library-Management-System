@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}User Home{% endblock %}
+
+{% block content %}
+    {% if current_user.is_authenticated %}
+        <h2>Recommended Books</h2>
+        {% for book in recommendations %}
+            <div class="book-card d-flex mb-3">
+            <div class="book-image mr-3" style="flex: 0 0 150px;">
+                <img src="{{ book['image_link'] }}" alt="Book" style="width: 100%; height: auto;">
+            </div>
+            <div class="book-details">
+                <h3>{{ book['title'] }}</h3>
+                <p><strong>Authors:</strong> {{ book['authors'] }}</p>
+                <p><strong>Published Date:</strong> {{ book['published_date'] }}</p>
+                <p><strong>ISBN-13:</strong> {{ book['isbn'] }}</p>
+            </div>
+            </div>
+        {% endfor %}       
+    {% endif %}
+{% endblock %}

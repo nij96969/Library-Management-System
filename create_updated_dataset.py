@@ -19,6 +19,9 @@ def query_books():
                 'title': book.title,
                 'authors': book.authors,
                 'description': book.description,
+                'isbn':book.isbn,
+                'image_link':book.image_links,
+                'published_date':book.published_date,
             })
         
         # Convert list of dictionaries into a Pandas DataFrame

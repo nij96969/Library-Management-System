@@ -4,43 +4,17 @@ from app.models import Book , User , RequestBook , BorrowedBook , ReturnBook
 from datetime import datetime
 from app.models import db
 from sqlalchemy.orm import joinedload
-import requests , json
+import requests
 
 main = Blueprint('main', __name__)
 
 def books_in_library(search_query):
     results = Book.query.filter(Book.title.ilike(f"%{search_query}%")).all()
-    session['searched_books'] = [books.to_dict() for books in results]
-    session['query'] = search_query
-    return Book.query.filter(Book.title.ilike(f"%{search_query}%")).all()
+    return [book.to_dict() for book in results]
 
 def find_borrowed_book():
     borrowed_books = BorrowedBook.query.options(joinedload(BorrowedBook.book)).filter_by(user_id=current_user.id).all()
-    session['borrowed_books'] = [book.to_dict() for book in borrowed_books]
-    return BorrowedBook.query.options(joinedload(BorrowedBook.book)).filter_by(user_id=current_user.id).all()
-
-@main.before_request
-def generate_recommendations():
-    if current_user.is_authenticated:
-        # Check if recommendations have already been generated
-        if 'recommendations_generated' not in session:
-            # Make a POST request to get recommendations
-            response = requests.post('http://localhost:8000/recommend',
-                                     json={'book_title': 'Harry Potter and the Chamber of Secrets'})
-            
-            # Check if the response was successful
-            if response.status_code == 200:
-                recommendations = response.json().get('recommendations', [])
-                # Store the recommendations in the session
-                session['recommendations_generated'] = recommendations
-            else:
-                session['recommendations_generated'] = []
-
-            print("recommendations are set now")
-
-        print("Welcome User")
-    else:
-        print("Not logged in")
+    return [book.to_dict() for book in borrowed_books]
 
 @main.route('/')
 def start_app():
@@ -49,15 +23,18 @@ def start_app():
 @main.route('/home')
 def home():
     if current_user.is_authenticated:
-        find_borrowed_book()
-        return render_template('home.html', borrowed_books = session.get('borrowed_books',[]) , results = session.get('searched_books',[]) , query = session.get('query','') , recommendations = session.get('recommendations_generated',[]))
+        # find_borrowed_book()
+        return render_template('home.html')
 
-    return render_template('home.html', results = session.get('searched_books',[]) , query = session.get('query',''))
+    return render_template('home.html')
 @main.route('/search', methods=['GET', 'POST'])
 def search_books():
     if request.method == 'POST':
         search_query = request.form.get('search_query', '').strip()
-        books_in_library(search_query)
+        print("Search Query :: " , search_query)
+        results=books_in_library(search_query)
+        # print(results)
+        return render_template('home.html' , results = results , query = search_query)
 
     return redirect(url_for('main.home'))
 
@@ -70,11 +47,13 @@ def request_book():
 
     user = User.query.get(user_id)
     book = Book.query.get(book_id)
-    
-
+    query = request.form.get('search_query')
+    results = request.form.get('results')
+    print(query)
+    print("Results from UI ::" , results)
     if not user or not book:
         flash('Invalid user or book', 'danger')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.home',result=books_in_library(query)))
 
     # Check if the book is already borrowed
     borrowed = BorrowedBook.query.filter_by(book_id=book_id, is_returned=False).first()
@@ -94,7 +73,7 @@ def request_book():
         
         flash('Book Request sent')
 
-    return redirect(url_for('main.home'))
+    return render_template('home.html' , results = books_in_library(query) , query = query)
 
 @login_required
 @main.route('/return_book', methods=['POST'])
@@ -123,9 +102,35 @@ def return_book():
 
         flash('Request to return Book sent')
 
-    return redirect(url_for('main.home'))
+    return redirect(url_for('main.show_borrowed_books'))
 
 @main.route('/refresh', methods = ['POST'])
 @login_required
 def refresh():
-    return redirect(url_for('main.home'))
+    return redirect(url_for('main.show_borrowed_books'))
+
+@main.route('/borrowed_books')
+@login_required
+def show_borrowed_books():
+    return render_template('user/borrowed_books.html',borrowed_books = find_borrowed_book())
+
+@main.route('/recommend_books')
+@login_required
+def show_recommended_books():
+    if 'recommendations_generated' not in session:
+            # Make a POST request to get recommendations
+            response = requests.post('http://localhost:8000/recommend',
+                                     json={'book_title': 'Harry Potter and the Chamber of Secrets'})
+            
+            # Check if the response was successful
+            if response.status_code == 200:
+                recommendations = response.json().get('recommendations', [])
+                # Store the recommendations in the session
+                session['recommendations_generated'] = recommendations
+            else:
+                session['recommendations_generated'] = []
+
+#             print("recommendations are set now")
+    return render_template('user/recommended_books.html' , recommendations = session.get('recommendations_generated'))
+
+
