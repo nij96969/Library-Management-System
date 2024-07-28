@@ -4,6 +4,7 @@ from app.models import Book , User , RequestBook , BorrowedBook , ReturnBook
 from datetime import datetime
 from app.models import db
 from sqlalchemy.orm import joinedload
+import requests , json
 
 main = Blueprint('main', __name__)
 
@@ -18,11 +19,38 @@ def find_borrowed_book():
     session['borrowed_books'] = [book.to_dict() for book in borrowed_books]
     return BorrowedBook.query.options(joinedload(BorrowedBook.book)).filter_by(user_id=current_user.id).all()
 
+@main.before_request
+def generate_recommendations():
+    if current_user.is_authenticated:
+        # Check if recommendations have already been generated
+        if 'recommendations_generated' not in session:
+            # Make a POST request to get recommendations
+            response = requests.post('http://localhost:8000/recommend',
+                                     json={'book_title': 'Harry Potter and the Chamber of Secrets'})
+            
+            # Check if the response was successful
+            if response.status_code == 200:
+                recommendations = response.json().get('recommendations', [])
+                # Store the recommendations in the session
+                session['recommendations_generated'] = recommendations
+            else:
+                session['recommendations_generated'] = []
+
+            print("recommendations are set now")
+
+        print("Welcome User")
+    else:
+        print("Not logged in")
+
 @main.route('/')
+def start_app():
+    return redirect(url_for('main.home'))
+
+@main.route('/home')
 def home():
     if current_user.is_authenticated:
         find_borrowed_book()
-        return render_template('home.html', borrowed_books=session.get('borrowed_books',[]) , results = session.get('searched_books',[]) , query = session.get('query',''))
+        return render_template('home.html', borrowed_books = session.get('borrowed_books',[]) , results = session.get('searched_books',[]) , query = session.get('query','') , recommendations = session.get('recommendations_generated',[]))
 
     return render_template('home.html', results = session.get('searched_books',[]) , query = session.get('query',''))
 @main.route('/search', methods=['GET', 'POST'])
