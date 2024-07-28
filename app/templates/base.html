@@ -19,9 +19,9 @@
     <nav>
         <a href="{{ url_for('main.home') }}">Home</a>
         {% if current_user.is_authenticated %}
-            <a href="{{ url_for('auth.logout') }}">Logout</a>
-            <a href="{{ url_for('main.show_borrowed_books') }}">Borrowed Books</a>
-            <a href="{{ url_for('main.show_recommended_books') }}">Recommend Books</a>
+        <a href="{{ url_for('main.show_borrowed_books') }}">Borrowed Books</a>
+        <a href="{{ url_for('main.show_recommended_books') }}">Recommend Books</a>
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
         {% else %}
             <a href="{{ url_for('auth.login') }}">Login</a>
             <a href="{{ url_for('auth.signup') }}">Sign Up</a>
