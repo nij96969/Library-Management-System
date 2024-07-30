@@ -22,11 +22,8 @@ def start_app():
 
 @main.route('/home')
 def home():
-    if current_user.is_authenticated:
-        # find_borrowed_book()
         return render_template('home.html')
 
-    return render_template('home.html')
 @main.route('/search', methods=['GET', 'POST'])
 def search_books():
     if request.method == 'POST':
@@ -133,4 +130,7 @@ def show_recommended_books():
 #             print("recommendations are set now")
     return render_template('user/recommended_books.html' , recommendations = session.get('recommendations_generated'))
 
-
+@main.route('/show_description')
+@login_required
+def show_book_description():
+    return
