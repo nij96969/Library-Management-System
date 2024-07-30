@@ -18,12 +18,15 @@ def librarian_required(f):
 
 def update_session_requests():
     user_request = RequestBook.query.all()
-    session['user_request_book'] = [user_req.to_dict() for user_req in user_request]
+    user_request = [user_req.to_dict() for user_req in user_request]
+    session['user_request_book'] = user_request
     return user_request
 
 def update_session_return_request():
     user_return_book = ReturnBook.query.all()
-    session['user_return_book'] = [user_req.to_dict() for user_req in user_return_book]
+    user_return_book = [user_req.to_dict() for user_req in user_return_book]
+    session['user_return_book'] = user_return_book
+    return user_return_book
 
 @librarian.route('/librarian/dashboard')
 @login_required
