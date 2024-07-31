@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}User Home{% endblock %}
+
+{% block content %}
+<div class="book-card">
+    <div class="d-flex mb-3">
+        <div class="book-image mr-3" style="flex: 0 0 150px;">
+            <img src="{{ book.image_links }}" alt="Book" style="width: 100%; height: auto;">
+        </div>
+        <div class="book-details">
+            <h3><strong>{{ book.title }}</strong></h3>
+            <p><strong>Authors:</strong> {{ book.authors }}</p>
+            <p><strong>Published Date:</strong> {{ book.published_date }}</p>
+            <p><strong>ISBN-13:</strong> {{ book.isbn }}</p>
+            <p><strong>Category:</strong> {{ book.categories }}</p>
+            <p><strong>Language:</strong> {{ book.language }}</p>
+            <p><strong>Maturity:</strong> {{ book.maturity_rating }}</p>
+            <p><strong>Description:</strong> {{ book.description }}</p>
+        </div>
+    </div>
+    {% if current_user.is_authenticated %}
+    <form action="{{ url_for('main.request_book') }}" method="POST">
+        <input type="hidden" name="book_id" value="{{ book.book_id }}">
+        <input type="hidden" name="search_query" value="{{ query }}">
+        <input type="hidden" name="user_id" value="{{ current_user.id }}">
+        <button type="submit" class="btn btn-primary">Request Book</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

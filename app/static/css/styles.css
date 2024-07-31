@@ -110,4 +110,11 @@ body {
     }
   }
   
+  .for-anchor {
+    color: black;
+    text-decoration: none !important;
+  }
   
+  .for-anchor:hover{
+    color: black;
+  }

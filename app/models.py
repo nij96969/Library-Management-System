@@ -48,7 +48,6 @@ class Book(db.Model):
     image_links = db.Column(db.String(255), nullable=True, server_default="N/A")
     language = db.Column(db.String(10), nullable=False, server_default="N/A")
     categories = db.Column(db.String(255), nullable=True, server_default="N/A")
-    # is_available = db.Column(db.Boolean , default = True)
 
     transactions = db.relationship('Transaction', back_populates='book')
     borrowed_books = db.relationship('BorrowedBook', back_populates='book')
@@ -65,6 +64,19 @@ class Book(db.Model):
             'image_links': self.image_links
         }
 
+    def complete_info_to_dict(self):
+        return {
+            'book_id': self.book_id,
+            'title': self.title,
+            'authors': self.authors,
+            'published_date': self.published_date,
+            'isbn': self.isbn,
+            'image_links': self.image_links,
+            'description': self.description,
+            'categories':self.categories,
+            'language':self.language,
+            'maturity_rating':self.maturity_rating,
+        }
 class Transaction(db.Model):
     __tablename__ = 'transactions'  # Changed to plural for consistency
 

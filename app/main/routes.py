@@ -4,7 +4,8 @@ from app.models import Book , User , RequestBook , BorrowedBook , ReturnBook
 from datetime import datetime
 from app.models import db
 from sqlalchemy.orm import joinedload
-import requests
+import requests , json
+from urllib.parse import unquote
 
 main = Blueprint('main', __name__)
 
@@ -34,7 +35,6 @@ def search_books():
         return render_template('home.html' , results = results , query = search_query)
 
     return redirect(url_for('main.home'))
-
 
 @login_required
 @main.route('/request_book', methods=['POST'])
@@ -69,14 +69,17 @@ def request_book():
         db.session.commit()
         
         flash('Book Request sent')
-
-    return render_template('home.html' , results = books_in_library(query) , query = query)
+        # Serialize book data
+    return redirect(url_for('main.show_book_description',book_id = book_id))
 
 @login_required
 @main.route('/return_book', methods=['POST'])
 def return_book():
     user_id = request.form.get('user_id')
     book_id = request.form.get('book_id')
+    book_data = request.form.get('book_data')
+
+    print(book_data)
     
     user = User.query.get(user_id)
     book = Book.query.get(book_id)
@@ -130,7 +133,9 @@ def show_recommended_books():
 #             print("recommendations are set now")
     return render_template('user/recommended_books.html' , recommendations = session.get('recommendations_generated'))
 
-@main.route('/show_description')
+@main.route('/show_description/<int:book_id>', methods=['GET'])
 @login_required
-def show_book_description():
-    return
+def show_book_description(book_id):
+        book = Book.query.filter_by(book_id=book_id).first()
+        return render_template("user/description.html", book=book.complete_info_to_dict())
+

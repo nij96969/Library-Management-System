@@ -27,7 +27,8 @@
         <h2>Search Results for "{{ query }}"</h2>
         {% if results %}
           {% for book in results %}
-              <div class="book-card">
+          <a href="{{ url_for('main.show_book_description' , book_id=book.book_id) }}" class="for-anchor">
+            <div class="book-card">
                   <div class="d-flex mb-3">
                       <div class="book-image mr-3" style="flex: 0 0 150px;">
                           <img src="{{ book.image_links }}" alt="Book" style="width: 100%; height: auto;">
@@ -39,16 +40,8 @@
                           <p><strong>ISBN-13:</strong> {{ book.isbn }}</p>
                       </div>
                   </div>
-                  {% if current_user.is_authenticated %}
-                  <form action="{{ url_for('main.request_book') }}" method="POST">
-                      <input type="hidden" name="book_id" value="{{ book.book_id }}">
-                      <input type="hidden" name="user_id" value="{{ current_user.id }}">
-                      <input type="hidden" name="search_query" value="{{ query }}">
-                      <input type="hidden" name="results" value="{{ results }}">
-                      <button type="submit" class="btn btn-primary">Request Book</button>
-                  </form>
-                  {% endif %}
               </div>
+            </a>
           {% endfor %}
       {% else %}
           <p>No results found.</p>
