@@ -81,24 +81,6 @@ async def startup_event():
         books_data = pd.read_csv("books_set.csv")
         preprocess_data(books_data)
 
-# @app.post("/recommend")
-# async def recommend_books(request: BookRecommendationRequest):
-#     global df_filtered, hybrid_sim
-
-#     book_title = request.book_title
-#     try:
-#         book_index = df_filtered[df_filtered['title'] == book_title].index[0]
-#     except IndexError:
-#         raise HTTPException(status_code=404, detail=f"Book '{book_title}' not found in the database.")
-
-#     similar_books = list(enumerate(hybrid_sim[book_index]))
-#     sorted_similar_books = sorted(similar_books, key=lambda x: x[1], reverse=True)[1:6]
-
-#     recommendations = [df_filtered.iloc[i[0]]['title'] for i in sorted_similar_books]
-    
-#     return {"recommendations": recommendations}
-
-
 @app.post("/recommend")
 async def recommend_books(request: BookRecommendationRequest):
     global df_filtered, hybrid_sim
@@ -115,7 +97,11 @@ async def recommend_books(request: BookRecommendationRequest):
     recommendations = [
         {
             'book_id': int(df_filtered.iloc[i[0]]['book_id']),
-            'title': df_filtered.iloc[i[0]]['title']
+            'title': df_filtered.iloc[i[0]]['title'],
+            'authors': df_filtered.iloc[i[0]]['authors'],
+            'isbn': df_filtered.iloc[i[0]]['isbn'],
+            'image_link':df_filtered.iloc[i[0]]['image_link'],
+            'published_date':df_filtered.iloc[i[0]]['published_date']
         }
         for i in sorted_similar_books
     ]

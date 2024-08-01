@@ -119,6 +119,10 @@ def show_borrowed_books():
 def show_recommended_books():
     if 'recommendations_generated' not in session:
             # Make a POST request to get recommendations
+
+            #Write the logic for obtaining getting transaction as user history with usr_id & borrow as filter and than use book id to get title of it
+            #use the last 5 transaction from the transaction for recommending books 
+            
             response = requests.post('http://localhost:8000/recommend',
                                      json={'book_title': 'Harry Potter and the Chamber of Secrets'})
             
