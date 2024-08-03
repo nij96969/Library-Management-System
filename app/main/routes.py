@@ -123,10 +123,10 @@ def show_recommended_books():
             #Write the logic for obtaining getting transaction as user history with usr_id & borrow as filter and than use book id to get title of it
             #use the last 5 transaction from the transaction for recommending books 
             
-            book_ids = Transaction.query.filter_by(user_id = current_user.id).all()
+            book_ids = Transaction.query.filter_by(user_id = current_user.id , transaction_type = "borrow").all()
 
             book_ids = list(dict.fromkeys([book.book_id for book in book_ids][-5:]))
-            
+
             response = requests.post('http://localhost:8000/recommend', 
                          json={'book_ids': book_ids})
 
