@@ -18,8 +18,11 @@ hybrid_sim = None
 tfidf_vectorizer = None
 tfidf_matrix = None
 
+# class BookRecommendationRequest(BaseModel):
+#     book_title: str
+
 class BookRecommendationRequest(BaseModel):
-    book_title: str
+    book_ids: List[int]  # Expecting a list of integers representing book IDs
 
 class DataUpdateRequest(BaseModel):
     data: List[Dict]  # List of dictionaries to represent the DataFrame rows
@@ -83,31 +86,73 @@ async def startup_event():
 
 @app.post("/recommend")
 async def recommend_books(request: BookRecommendationRequest):
-    global df_filtered, hybrid_sim
+    book_ids = request.book_ids
 
-    book_title = request.book_title
-    try:
-        book_index = df_filtered[df_filtered['title'] == book_title].index[0]
-    except IndexError:
-        raise HTTPException(status_code=404, detail=f"Book '{book_title}' not found in the database.")
+    # Precompute index lookups for better performance
+    book_indices = df_filtered.set_index('book_id').reindex(book_ids).index
+    if book_indices.isnull().any():
+        missing_ids = book_ids[pd.isnull(book_indices)]
+        raise HTTPException(status_code=404, detail=f"Books not found in the database: {', '.join(map(str, missing_ids))}")
 
-    similar_books = list(enumerate(hybrid_sim[book_index]))
-    sorted_similar_books = sorted(similar_books, key=lambda x: x[1], reverse=True)[1:6]
+    recommendations = []
 
-    recommendations = [
-        {
-            'book_id': int(df_filtered.iloc[i[0]]['book_id']),
-            'title': df_filtered.iloc[i[0]]['title'],
-            'authors': df_filtered.iloc[i[0]]['authors'],
-            'isbn': df_filtered.iloc[i[0]]['isbn'],
-            'image_link':df_filtered.iloc[i[0]]['image_link'],
-            'published_date':df_filtered.iloc[i[0]]['published_date']
-        }
-        for i in sorted_similar_books
-    ]
-    
+    for book_id in book_ids:
+        try:
+            book_index = df_filtered.index[df_filtered['book_id'] == book_id].tolist()[0]
+        except IndexError:
+            raise HTTPException(status_code=404, detail=f"Book '{book_id}' not found in the database.")
+        
+        similar_books = list(enumerate(hybrid_sim[book_index]))
+        sorted_similar_books = sorted(similar_books, key=lambda x: x[1], reverse=True)[1:3]
+
+        # Retrieve book details once
+        book_details = df_filtered.loc[df_filtered['book_id'].isin([i[0] for i in sorted_similar_books])]
+
+        recommendations.extend([
+            {
+                'book_id': int(row['book_id']),
+                'title': row['title'],
+                'authors': row['authors'],
+                'isbn': row['isbn'],
+                'image_link': row['image_link'],
+                'published_date': row['published_date']
+            }
+            for _, row in book_details.iterrows()
+        ])
+
     return {"recommendations": recommendations}
 
+# @app.post("/recommend")
+# async def recommend_books(request: BookRecommendationRequest):
+#     global df_filtered, hybrid_sim
+
+#     book_ids = request.book_ids
+
+#     recommendations = []
+#     for book_id in book_ids:
+
+#         try:
+#             book_index = df_filtered[df_filtered['book_id'] == book_id].index[0]
+#             print(book_index)
+#         except IndexError:
+#             raise HTTPException(status_code=404, detail=f"Book '{book_id}' not found in the database.")
+
+#         similar_books = list(enumerate(hybrid_sim[book_index]))
+#         sorted_similar_books = sorted(similar_books, key=lambda x: x[1], reverse=True)[1:2]
+
+#         recommendations += [
+#             {
+#                 'book_id': int(df_filtered.iloc[i[0]]['book_id']),
+#                 'title': df_filtered.iloc[i[0]]['title'],
+#                 'authors': df_filtered.iloc[i[0]]['authors'],
+#                 'isbn': df_filtered.iloc[i[0]]['isbn'],
+#                 'image_link':df_filtered.iloc[i[0]]['image_link'],
+#                 'published_date':df_filtered.iloc[i[0]]['published_date']
+#             }
+#             for i in sorted_similar_books
+#         ]
+    
+#     return {"recommendations": recommendations}
 
 @app.post("/update_data")
 async def update_data(request: DataUpdateRequest):

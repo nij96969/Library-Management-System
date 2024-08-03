@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template , redirect , url_for , request , flash , session
 from flask_login import login_required , current_user
-from app.models import Book , User , RequestBook , BorrowedBook , ReturnBook
+from app.models import Book , User , RequestBook , BorrowedBook , ReturnBook , Transaction
 from datetime import datetime
 from app.models import db
 from sqlalchemy.orm import joinedload
@@ -123,9 +123,13 @@ def show_recommended_books():
             #Write the logic for obtaining getting transaction as user history with usr_id & borrow as filter and than use book id to get title of it
             #use the last 5 transaction from the transaction for recommending books 
             
-            response = requests.post('http://localhost:8000/recommend',
-                                     json={'book_title': 'Harry Potter and the Chamber of Secrets'})
+            book_ids = Transaction.query.filter_by(user_id = current_user.id).all()
+
+            book_ids = list(dict.fromkeys([book.book_id for book in book_ids][-5:]))
             
+            response = requests.post('http://localhost:8000/recommend', 
+                         json={'book_ids': book_ids})
+
             # Check if the response was successful
             if response.status_code == 200:
                 recommendations = response.json().get('recommendations', [])
@@ -134,7 +138,6 @@ def show_recommended_books():
             else:
                 session['recommendations_generated'] = []
 
-#             print("recommendations are set now")
     return render_template('user/recommended_books.html' , recommendations = session.get('recommendations_generated'))
 
 @main.route('/show_description/<int:book_id>', methods=['GET'])
