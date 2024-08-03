@@ -4,8 +4,7 @@ from app.models import Book , User , RequestBook , BorrowedBook , ReturnBook , T
 from datetime import datetime
 from app.models import db
 from sqlalchemy.orm import joinedload
-import requests , json
-from urllib.parse import unquote
+import requests
 
 main = Blueprint('main', __name__)
 
@@ -125,6 +124,7 @@ def show_recommended_books():
             
             book_ids = Transaction.query.filter_by(user_id = current_user.id , transaction_type = "borrow").all()
 
+            #To find Unique Values and that too last 5 
             book_ids = list(dict.fromkeys([book.book_id for book in book_ids][-5:]))
 
             response = requests.post('http://localhost:8000/recommend', 
